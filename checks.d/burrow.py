@@ -1,5 +1,5 @@
 # stdlib
-from urlparse import urljoin
+from urllib.parse import urljoin
 
 # 3rd Party
 import requests
@@ -80,13 +80,13 @@ class BurrowCheck(AgentCheck):
                 "REWIND": 0
         }
 
-        if status not in burrow_status.keys():
+        if status not in list(burrow_status.keys()):
             self.log.error("Invalid lag status: '%s' for '%s'" % (status, tags))
             return
 
         burrow_status[status] = 1
 
-        for metric_name, value in burrow_status.iteritems():
+        for metric_name, value in list(burrow_status.items()):
             self.gauge("%s.%s" % (metric_namespace, metric_name.lower()), value, tags=tags)
 
     def _submit_partition_lags(self, partition, tags):
@@ -146,7 +146,7 @@ class BurrowCheck(AgentCheck):
                 topics_response = self._rest_request_to_json(burrow_address, topics_path)
 
                 if 'topics' in topics_response:
-                    for topic_name, offsets in topics_response["topics"].iteritems():
+                    for topic_name, offsets in list(topics_response["topics"].items()):
                         # topic_path = "%s/%s" % (topics_path, topic)
                         # response = self._rest_request_to_json(burrow_address, topic_path)
                         # if not response:
@@ -159,7 +159,7 @@ class BurrowCheck(AgentCheck):
                             else:
                                 return 0
 
-                        offsets_num = map(u, offsets)
+                        offsets_num = list(map(u, offsets))
 
                         tags = ["topic:%s" % topic_name, "cluster:%s" % cluster,
                                 "consumer:%s" % consumer] + extra_tags
